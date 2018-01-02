@@ -1,0 +1,204 @@
+<html ng-app="app" ng-controller="BinaryController as c">
+
+<head>
+
+    <link rel="icon" sizes="192x192" type="image/png" href="https://www.binary.com/images/favicons/favicon-192x192.png" />
+    <link rel="icon" sizes="160x160" type="image/png" href="https://www.binary.com/images/favicons/favicon-160x160.png" />
+    <link rel="icon" sizes="96x96" type="image/png" href="https://www.binary.com/images/favicons/favicon-96x96.png" />
+    <link rel="icon" sizes="16x16" type="image/png" href="https://www.binary.com/images/favicons/favicon-16x16.png" />
+    <link rel="icon" sizes="32x32" type="image/png" href="https://www.binary.com/images/favicons/favicon-32x32.png" />
+
+    <title>Binary Simuator</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.js"></script>
+    <script src="./binary-live-api.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.3/moment.min.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js'></script>
+
+    <style>
+        .tradingview {
+            border: none;
+            width: 95%;
+            height: 840px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div style="margin: 10px;">
+        <div><span>{{status}}</span></div>
+        <div>
+            Second {{second}}: 
+            Open <mark>{{lastCandle().open}}</mark>&nbsp;
+            High <mark>{{lastCandle().high}}</mark>&nbsp;
+            Low <mark>{{lastCandle().low}}</mark>&nbsp;
+            Close <mark>{{lastCandle().close}}</mark>&nbsp;
+        </div>
+        <div>
+            BB <mark>{{bb[0]}}</mark>&nbsp;<mark>{{bb[1]}}</mark>&nbsp;<mark>{{bb[2]}}</mark>
+        </div>
+    </div>
+</body>
+
+<script>
+
+    if (Notification.permission !== "granted")
+        Notification.requestPermission();
+
+    function sum(data) {
+        return data.reduce(function(acc, x) {
+            return acc + x;
+        });
+    }
+
+    function mean(data) {
+        return data.reduce(function (a, b) {
+            return a + b;
+        }) / data.length;
+    }
+
+    function stddev(data) {
+        var dataMean = mean(data);
+        var sqDiff = data.map(function (n) {
+            return Math.pow(n - dataMean, 2);
+        });
+        var avgSqDiff = mean(sqDiff);
+        return Math.sqrt(avgSqDiff);
+    }
+    
+    function takeField(arr, field) {
+        return arr.map(function(x) {
+            return field ? x[field] : x;
+        });
+    }
+
+    function takeLast(arr, n, field) {
+        return takeField(arr.slice(n > arr.length ? 0 : arr.length - n, arr.length), field);
+    }
+
+    function simpleMovingAverage(data, config) {
+        var vals = takeLast(data, config.periods, config.field);
+        return sum(vals) / config.periods;
+    }
+
+    function calculateBB(data, config) {
+        var vals = takeLast(data, config.periods, config.field);
+        var middle = simpleMovingAverage(vals, { periods: config.periods });
+        var stdDev = stddev(vals);
+        var upper = middle + stdDev * config.stdDevUp;
+        var lower = middle - stdDev * config.stdDevDown;
+        return [+middle.toFixed(config.pipSize), +upper.toFixed(config.pipSize), +lower.toFixed(config.pipSize)];
+    }
+
+    var app = angular.module('app', []);
+    var LiveApi = window['binary-live-api'].LiveApi;
+
+    app.controller('BinaryController', ['$scope', function($scope) {
+
+        var _self = this;
+        var api = new LiveApi({
+            appId: '11588'
+        });
+        
+        $scope.candles = [];
+        $scope.status = 'Initing...';
+        $scope.bb = {
+        };
+
+        $scope.lastCandle = function() {
+            return $scope.candles[$scope.candles.length - 1];
+        };
+
+        api.authorize('dIWhsmo8qEJmOLt').then(function() {
+            $scope.status = 'Connected';
+            $scope.$apply();
+            _self.getData();
+        });
+
+        api.events.on('ohlc', function(data) {
+            var ohlc = data.ohlc;
+            var lastCandle = $scope.candles[$scope.candles.length - 1];
+            var candle = {
+                open: Number(ohlc.open),
+                close: Number(ohlc.close),
+                high: Number(ohlc.high),
+                low: Number(ohlc.low),
+                time: Number(ohlc.open_time)
+            };
+
+            var second = ohlc.epoch - ohlc.open_time;
+
+            if (candle.time == lastCandle.time) {
+                $scope.candles[$scope.candles.length - 1] = candle;
+            } else {
+                $scope.candles.push(candle);
+            }
+            $scope.bb = calculateBB($scope.candles, {
+                periods: 20,
+                pipSize: 4,
+                stdDevUp: 2.5,
+                stdDevDown: 2.5,
+                field: 'close',
+            });
+
+            var delta = 3;
+
+            if (Math.abs(candle.close - $scope.bb[1]) <= delta || Math.abs(candle.close - $scope.bb[2]) <= delta) {
+                if (second >= 50) {
+                    var body = 'Second ' + second + ' --> ' + Math.abs(candle.close - $scope.bb[1]) <= delta ? 'BUY' : 'SELL';
+                    if (!$scope.notification) {
+                        $scope.notification = new Notification('Binary Notification', {
+                            icon: 'https://www.binary.com/images/favicons/favicon-96x96.png',
+                            body: body
+                        });
+                        $scope.notification.onclick = function() {
+                            $scope.notification.close();
+                        }
+                        $scope.notification.onclose = function() {
+                            $scope.notification = undefined;
+                        }
+                    }
+                }
+            }
+            $scope.second = second;
+            $scope.$apply();
+        });
+
+        _self.getData = function(timestamp) {
+            api.getCandles('R_100', {end: 'latest', count: 50, granularity: 60, subscribe: 1}).then(function(data) {
+                var candles = data.candles;
+                for (let i = 0; i < candles.length; i++) {
+                    $scope.candles.push({
+                        open: Number(candles[i].open),
+                        close: Number(candles[i].close),
+                        high: Number(candles[i].high),
+                        low: Number(candles[i].low),
+                        time: Number(candles[i].epoch)
+                    });
+                }
+            });
+        };
+
+        _self.runBot = function() {
+            var nextTickIndex = 0;
+            for (var i = 0; i < $scope.prices.length; i++) {
+                var tick = $scope.prices[i];
+                if (i >= nextTickIndex) {
+
+                }
+            }
+        };
+
+        $scope.simulate = function() {
+            $scope.status = 'Get data...';
+            self.getData($scope.timestampStart);
+        };
+
+    }]);
+</script>
+
+</html>
