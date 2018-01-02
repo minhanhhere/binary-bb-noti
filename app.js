@@ -70,14 +70,17 @@ app.controller('BinaryController', ['$scope', function($scope) {
 
     function processContractResult(contract) {
         if (contract.status == 'won') {
+            $scope.profit += contract.payout - contract.buy_price;
             $scope.level = 1;
         }
         if (contract.status == 'lost') {
+            $scope.profit -= contract.buy_price;
             $scope.level++;
             if ($scope.level > 4) {
                 $scope.level = 1;
             }
         }
+        $scope.profit = +$scope.profit.toFixed(2);
         if ($scope.level == 1) {
             $scope.stake = $scope.config.initStake;
         }
@@ -104,6 +107,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
     $scope.status = 'Initing...';
     $scope.bb = {};
     $scope.level = 1;
+    $scope.profit = 0;
     $scope.config = {
         symbol: 'R_100',
         initStake: 1,
