@@ -1,1 +1,1 @@
-# binary-bb-noti
+# Binary.com Bollinger Bands Trading Tool
