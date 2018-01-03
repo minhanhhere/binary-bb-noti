@@ -105,7 +105,7 @@
                             <div class="card-header bg-success text-white">
                                 Trades
                             </div>
-                            <div class="card-body">
+                            <div class="card-body" style="overflow: auto; height: 240px;">
                                 <table class="table table-hover" style="font-size: 0.85em;">
                                     <thead>
                                     <tr>
@@ -121,7 +121,7 @@
                                         <td><abbr title="{{formatTime(contract.purchase_time)}}">{{contract.purchase_time}}</abbr></td>
                                         <td>{{contract.contract_id}}</td>
                                         <td>{{contract.contract_type}}{{getTimeout(contract)}}</td>
-                                        <td class="text-right">{{contract.buy_price | currency}}</td>
+                                        <td class="text-right">${{contract.buy_price}}</td>
                                         <td class="text-right text-emphasis">
                                             <span class="{{getContractStatusBackground(contract)}} {{getContractStatusColor(contract)}}">{{getProfit(contract)}}</span>
                                         </td>
