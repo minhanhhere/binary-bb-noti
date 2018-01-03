@@ -83,6 +83,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
     api.events.on('balance', function(data) {
         var balance = data.balance;
         $scope.balance = balance.balance;
+        $scope.loginid = balance.loginid;
         $scope.$apply();
     });
 
