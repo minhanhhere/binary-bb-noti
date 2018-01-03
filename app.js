@@ -100,7 +100,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
         }
         $scope.profit = +$scope.profit.toFixed(2);
         if ($scope.level == 1) {
-            $scope.stake = $scope.config.initStake;
+            $scope.stake = +$scope.config.initStake;
         }
         if ($scope.level == 2 || $scope.level == 3) {
             $scope.stake = +(contract.payout / $scope.profitRatio).toFixed(2);
@@ -195,7 +195,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
     $scope.authorize = function () {
         $scope.status = 'Authorizing';
         Cookies.set('config.token', $scope.config.token);
-        $scope.stake = $scope.config.initStake;
+        $scope.stake = +$scope.config.initStake;
         api.authorize($scope.config.token).then(function() {
             $scope.status = 'Authorized';
             $scope.$apply();
@@ -203,7 +203,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
             api.subscribeToBalance();
             //api.subscribeToAllOpenContracts();
             api.getPriceProposalForContract({
-                amount: $scope.config.initStake,
+                amount: +$scope.config.initStake,
                 basis: 'stake',
                 contract_type: 'CALL',
                 currency: 'USD',
