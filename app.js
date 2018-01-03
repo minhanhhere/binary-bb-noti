@@ -39,11 +39,11 @@ app.controller('BinaryController', ['$scope', function($scope) {
             field: 'close',
         });
 
-        var delta = 3;
+        var delta = 1;
 
         if (Math.abs(candle.close - $scope.bb[1]) <= delta || Math.abs(candle.close - $scope.bb[2]) <= delta) {
-            if (second >= 50) {
-                var body = 'Second ' + second + ' --> ' + Math.abs(candle.close - $scope.bb[1]) <= delta ? 'BUY' : 'SELL';
+            if (second >= 40) {
+                var body = 'Second ' + second + ' --> ' + (Math.abs(candle.close - $scope.bb[1]) <= delta ? 'PUT' : 'CALL');
                 if (!$scope.notification) {
                     $scope.notification = new Notification('Binary Notification', {
                         icon: 'https://www.binary.com/images/favicons/favicon-96x96.png',
@@ -55,6 +55,23 @@ app.controller('BinaryController', ['$scope', function($scope) {
                     $scope.notification.onclose = function() {
                         $scope.notification = undefined;
                     };
+                    setTimeout(function () {
+                        if ($scope.notification) {
+                            $scope.notification.close();
+                        }
+                    }, 8000);
+                }
+                if (second == 58) {
+                    if (candle.close >= $scope.bb[1]) {
+                        $scope.signal = (candle.close - $scope.bb[1]).toFixed(2);
+                    }
+                    if ($scope.bb[2] >= candle.close) {
+                        $scope.signal = ($scope.bb[2] - candle.close).toFixed(2);
+                    }
+                    setTimeout(function () {
+                        $scope.signal = undefined;
+                        $scope.$apply();
+                    }, 8000);
                 }
             }
         }

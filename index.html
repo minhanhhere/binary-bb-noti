@@ -90,7 +90,6 @@
                                 </div>
                                 <div style="font-size: 0.8em">
                                     <div>
-                                        Second {{second}}:
                                         Open <mark>{{lastCandle().open}}</mark>&nbsp;
                                         High <mark>{{lastCandle().high}}</mark>&nbsp;
                                         Low <mark>{{lastCandle().low}}</mark>&nbsp;
@@ -98,46 +97,6 @@
                                     </div>
                                     <div>
                                         BB <mark>{{bb[0]}}</mark>&nbsp;<mark>{{bb[1]}}</mark>&nbsp;<mark>{{bb[2]}}</mark>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card border-dark mb-3" ng-show="isAuthorized()">
-                            <div class="card-header bg-dark text-white">
-                                Balance: <span ng-show="balance">{{balance | currency}} </span> <span class="float-right">Profit: {{profit | currency}}</span>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group row">
-                                    <div class="input-group input-group-sm col">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">Duration</span>
-                                        </div>
-                                        <input type="number" class="form-control" id="inputDuration" ng-model="config.duration">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">seconds</span>
-                                        </div>
-                                    </div>
-                                    <div class="input-group input-group-sm col">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">Stake</span>
-                                        </div>
-                                        <input type="number" class="form-control" id="inputStake" placeholder="Stake" ng-model="stake">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">$</span>
-                                        </div>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text text-white bg-success border-success">Profit: ${{potentialProfit()}}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <img class="d-block mb-3 mx-auto" src="https://www.binary.com/images/pages/trade/fall_1.png"/>
-                                        <button ng-click="buyContract('PUT')" class="btn btn-block btn-danger">PUT</button>
-                                    </div>
-                                    <div class="col">
-                                        <img class="d-block mb-3 mx-auto" src="https://www.binary.com/images/pages/trade/rise_1.png"/>
-                                        <button ng-click="buyContract('CALL')" class="btn btn-block btn-success">CALL</button>
                                     </div>
                                 </div>
                             </div>
@@ -169,6 +128,61 @@
                                     </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <div class="card border-info mb-3" ng-show="isAuthorized()">
+                            <div class="card-header bg-info text-white">
+                                Watch</span>
+                            </div>
+                            <div class="card-body">
+                                <h2 class="text-center">{{second}}</h2>
+                                <h3 class="text-center">{{signal}}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <div class="card border-dark mb-3" ng-show="isAuthorized()">
+                            <div class="card-header bg-dark text-white">
+                                Balance: <span ng-show="balance">{{balance | currency}} </span> <span class="float-right">Profit: {{profit | currency}}</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="input-group input-group-sm col">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Duration</span>
+                                        </div>
+                                        <input type="number" class="form-control" id="inputDuration" ng-model="config.duration">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">s</span>
+                                        </div>
+                                    </div>
+                                    <div class="input-group input-group-sm col">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input type="number" class="form-control" id="inputStake" placeholder="Stake" ng-model="stake">
+                                        <!--<div class="input-group-append">-->
+                                            <!--<span class="input-group-text">$</span>-->
+                                        <!--</div>-->
+                                        <div class="input-group-append">
+                                            <span class="input-group-text text-white bg-success border-success">Profit: ${{potentialProfit()}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <img class="d-block mb-3 mx-auto" src="https://www.binary.com/images/pages/trade/fall_1.png"/>
+                                        <button ng-click="buyContract('PUT')" class="btn btn-block btn-danger">PUT</button>
+                                    </div>
+                                    <div class="col">
+                                        <img class="d-block mb-3 mx-auto" src="https://www.binary.com/images/pages/trade/rise_1.png"/>
+                                        <button ng-click="buyContract('CALL')" class="btn btn-block btn-success">CALL</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
