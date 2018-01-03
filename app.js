@@ -43,13 +43,14 @@ app.controller('BinaryController', ['$scope', function($scope) {
 
         if (Math.abs(candle.close - $scope.bb[1]) <= delta || Math.abs(candle.close - $scope.bb[2]) <= delta) {
             if (second >= 40) {
-                var body = 'Second ' + second + ' --> ' + (Math.abs(candle.close - $scope.bb[1]) <= delta ? 'PUT' : 'CALL');
+                var body = second + 's --> ' + (Math.abs(candle.close - $scope.bb[1]) <= delta ? 'PUT' : 'CALL');
                 if (!$scope.notification) {
-                    $scope.notification = new Notification('Binary Notification', {
+                    $scope.notification = new Notification('Notification for ' + $scope.config.symbol, {
                         icon: 'https://www.binary.com/images/favicons/favicon-96x96.png',
                         body: body
                     });
                     $scope.notification.onclick = function() {
+                        window.focus();
                         $scope.notification.close();
                     };
                     $scope.notification.onclose = function() {
