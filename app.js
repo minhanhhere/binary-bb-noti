@@ -230,13 +230,24 @@ app.controller('BinaryController', ['$scope', function($scope) {
     };
 
     $scope.buyContract = function (type) {
+        $scope.buyContractForDuration(type, $scope.config.duration);
+    };
+
+    $scope.buyContractInCandle = function (type) {
+        var duration = 59 - 2 - $scope.second;
+        if (duration >= 15) {
+            $scope.buyContractForDuration(type, duration);
+        }
+    };
+
+    $scope.buyContractForDuration = function (type, duration) {
         api.buyContractParams({
             amount: $scope.stake,
             basis: 'stake',
             contract_type: type,
             currency: 'USD',
             symbol: $scope.config.symbol,
-            duration: $scope.config.duration,
+            duration: duration,
             duration_unit: 's'
         }, $scope.stake).then(function (data) {
             var buy = data.buy;
