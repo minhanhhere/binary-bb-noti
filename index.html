@@ -52,28 +52,40 @@
                             </div>
                             <div class="card-body">
                                 <!--<h5 class="card-title">Special title treatment</h5>-->
-                                <div class="form-group row">
-                                    <label for="inputToken" class="col-sm-3 col-form-label">Token</label>
-                                    <div class="col-sm-9">
+                                <div class="form-group form-row">
+                                    <!--<label for="inputToken" class="col-sm-3 col-form-label">Token</label>-->
+                                    <div class="input-group input-group-sm col">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Token</span>
+                                        </div>
                                         <input type="text" class="form-control" id="inputToken" placeholder="Token" ng-model="config.token">
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label for="inputSymbol" class="col-sm-3 col-form-label">Symbol</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" id="inputSymbol" placeholder="Symbol" ng-model="config.symbol">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="inputInitStake" class="col-sm-3 col-form-label">Init Stake</label>
-                                    <div class="col-sm-9">
+                                <div class="form-group form-row">
+                                    <div class="input-group input-group-sm col">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Initial&nbsp;</span>
+                                        </div>
                                         <input type="text" class="form-control" id="inputInitStake" placeholder="Symbol" ng-model="config.initStake">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                    </div>
+                                    <div class="input-group input-group-sm col">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Symbol</span>
+                                        </div>
+                                        <select class="form-control" id="inputSymbol" ng-model="config.symbol">
+                                            <option value="R_10">R_10</option>
+                                            <option value="R_25">R_25</option>
+                                            <option value="R_50">R_50</option>
+                                            <option value="R_75">R_75</option>
+                                            <option value="R_100">R_100</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <a href="#"
-                                       ng-click="authorize()"
-                                       class="btn btn-primary" ng-class="{ disabled: status != 'Connected' }">Authorize</a>
+                                    <button ng-click="authorize()" class="btn btn-primary btn-sm" ng-class="{ disabled: status != 'Connected' }">Authorize</button>
                                     <span ng-show="isAuthorizing()">&nbsp;Authorizing...</span>
                                 </div>
                                 <div style="font-size: 0.8em">
@@ -90,34 +102,43 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card border-info mb-3" ng-show="isAuthorized()">
-                            <div class="card-header bg-info text-white">
-                                Balance: <span ng-show="balance">${{balance}} </span> <span>Profit: ${{profit}}</span>
+                        <div class="card border-dark mb-3" ng-show="isAuthorized()">
+                            <div class="card-header bg-dark text-white">
+                                Balance: <span ng-show="balance">${{balance | number}} </span> <span class="float-right">Profit: ${{profit | number}}</span>
                             </div>
                             <div class="card-body">
-                                <!--<h5 class="card-title">Special title treatment</h5>-->
                                 <div class="form-group row">
-                                    <label for="inputDuration" class="col-sm-4 col-form-label">Duration</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="inputDuration" ng-model="config.duration">
+                                    <div class="input-group input-group-sm col">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Duration</span>
+                                        </div>
+                                        <input type="number" class="form-control" id="inputDuration" ng-model="config.duration">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">seconds</span>
+                                        </div>
+                                    </div>
+                                    <div class="input-group input-group-sm col">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Stake</span>
+                                        </div>
+                                        <input type="number" class="form-control" id="inputStake" placeholder="Stake" ng-model="stake">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text text-white bg-success border-success">Profit: ${{potentialProfit()}}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label for="inputStake" class="col-sm-4 col-form-label">Stake (Level {{level}})</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="inputStake" placeholder="Stake" ng-model="stake">
+                                <div class="row">
+                                    <div class="col">
+                                        <img class="d-block mb-3 mx-auto" src="https://www.binary.com/images/pages/trade/fall_1.png"/>
+                                        <button ng-click="buyContract('PUT')" class="btn btn-block btn-danger">PUT</button>
                                     </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="inputProfit" class="col-sm-4 col-form-label">Profit</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" readonly class="form-control-plaintext" id="inputProfit" ng-value="potentialProfit()">
+                                    <div class="col">
+                                        <img class="d-block mb-3 mx-auto" src="https://www.binary.com/images/pages/trade/rise_1.png"/>
+                                        <button ng-click="buyContract('CALL')" class="btn btn-block btn-success">CALL</button>
                                     </div>
-                                </div>
-                                <!--<p>Profit:  ${{potentialProfit()}}</p>-->
-                                <div class="row mb-3">
-                                    <div class="col"><button ng-click="buyContract('PUT')" class="btn btn-block btn-danger">PUT</button></div>
-                                    <div class="col"><button ng-click="buyContract('CALL')" class="btn btn-block btn-success">CALL</button></div>
                                 </div>
                             </div>
                         </div>
