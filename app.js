@@ -34,8 +34,8 @@ app.controller('BinaryController', ['$scope', function($scope) {
         $scope.bb = calculateBB($scope.candles, {
             periods: 20,
             pipSize: 4,
-            stdDevUp: 2.5,
-            stdDevDown: 2.5,
+            stdDevUp: 2.4,
+            stdDevDown: 2.4,
             field: 'close',
         });
 
