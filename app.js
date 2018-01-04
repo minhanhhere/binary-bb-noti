@@ -89,6 +89,30 @@ app.controller('BinaryController', ['$scope', function($scope) {
         $scope.$apply();
     });
 
+    function getTodayTradeResult() {
+        api.getProfitTable({
+            description: 1,
+            date_from: moment().format('YYYY-MM-DD'),
+            date_to: moment().format('YYYY-MM-DD'),
+        }).then(function(data) {
+            var transactions = data.profit_table.transactions;
+            for (var i = 0; i < transactions.length; i++) {
+                var trans = transactions[i];
+                var profit = trans.sell_price - trans.buy_price;
+                $scope.profit += profit;
+                $scope.contracts.push({
+                    contract_id: trans.contract_id,
+                    purchase_time: trans.purchase_time,
+                    contract_type: trans.shortcode.includes('PUT') ? 'PUT' : 'CALL',
+                    status: profit > 0 ? 'won' : 'lost',
+                    payout: trans.payout,
+                    buy_price: trans.buy_price
+                });
+            }
+            $scope.$apply();
+        });
+    }
+
     function processContractResult(contract) {
         if (contract.status == 'won') {
             $scope.profit += contract.payout - contract.buy_price;
@@ -203,8 +227,8 @@ app.controller('BinaryController', ['$scope', function($scope) {
             $scope.status = 'Authorized';
             $scope.$apply();
             $scope.getData();
+            getTodayTradeResult();
             api.subscribeToBalance();
-            //api.subscribeToAllOpenContracts();
             api.getPriceProposalForContract({
                 amount: +$scope.config.initStake,
                 basis: 'stake',
