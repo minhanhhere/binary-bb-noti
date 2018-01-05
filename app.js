@@ -298,3 +298,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
     };
 
 }]);
+
+var windowHeight = $(window.top).height();
+$('#tradingview').height(windowHeight - 20);
+$('#tradingview').attr('src', 'https://tradingview.binary.com/v1.3.10/main.html');
