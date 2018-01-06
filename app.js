@@ -10,7 +10,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
 
     function checkSignal(second, candle) {
         if (second == 58) {
-            var tradeType;
+            var tradeType = '';
             if (candle.close > $scope.bb[1]) {
                 $scope.signal = (candle.close - $scope.bb[1]).toFixed(2);
                 tradeType = 'PUT';
@@ -19,7 +19,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
                 $scope.signal = ($scope.bb[2] - candle.close).toFixed(2);
                 tradeType = 'CALL';
             }
-            if (tradeType && $scope.isAuto() && $scope.canTrade()) {
+            if (tradeType != '' && $scope.isAuto() && $scope.canTrade()) {
                 $scope.buyContractForDuration(tradeType, 59);
             }
             setTimeout(function () {
@@ -137,8 +137,8 @@ app.controller('BinaryController', ['$scope', function($scope) {
             if (second >= 40) {
                 sendNotification(second, candle, delta);
             }
-            checkSignal(second, candle);
         }
+        checkSignal(second, candle);
         $scope.second = second;
         $scope.$apply();
     });
@@ -178,7 +178,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
     };
 
     $scope.isAuto = function () {
-        return $scope.auto == "yes";
+        return $scope.config.auto == "yes";
     };
 
     $scope.canTrade = function () {
