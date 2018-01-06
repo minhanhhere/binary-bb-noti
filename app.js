@@ -8,86 +8,52 @@ app.controller('BinaryController', ['$scope', function($scope) {
         appId: '11588'
     });
 
-    api.ping().then(function () {
-        $scope.status = 'Connected';
-        $scope.$apply();
-    });
-
-    api.events.on('ohlc', function(data) {
-        var ohlc = data.ohlc;
-        var lastCandle = $scope.candles[$scope.candles.length - 1];
-        var candle = {
-            open: Number(ohlc.open),
-            close: Number(ohlc.close),
-            high: Number(ohlc.high),
-            low: Number(ohlc.low),
-            time: Number(ohlc.open_time)
-        };
-
-        var second = ohlc.epoch - ohlc.open_time;
-
-        if (candle.time == lastCandle.time) {
-            $scope.candles[$scope.candles.length - 1] = candle;
-        } else {
-            $scope.candles.push(candle);
-        }
-        $scope.bb = calculateBB($scope.candles, {
-            periods: 20,
-            pipSize: 4,
-            stdDevUp: 2.4,
-            stdDevDown: 2.4,
-            field: 'close',
-        });
-
-        var delta = 1;
-
-        if (Math.abs(candle.close - $scope.bb[1]) <= delta || Math.abs(candle.close - $scope.bb[2]) <= delta) {
-            if (second >= 40) {
-                var body = second + 's --> ' + (Math.abs(candle.close - $scope.bb[1]) <= delta ? 'PUT' : 'CALL');
-                var image = Math.abs(candle.close - $scope.bb[1]) <= delta ? 'img/put.png' : 'img/call.png';
-                if (!$scope.notification) {
-                    $scope.notification = new Notification('Notification for ' + $scope.config.symbol, {
-                        icon: 'https://www.binary.com/images/favicons/favicon-96x96.png',
-                        image: image,
-                        body: body
-                    });
-                    $scope.notification.onclick = function() {
-                        window.focus();
-                        $scope.notification.close();
-                    };
-                    $scope.notification.onclose = function() {
-                        $scope.notification = undefined;
-                    };
-                    setTimeout(function () {
-                        if ($scope.notification) {
-                            $scope.notification.close();
-                        }
-                    }, 8000);
-                }
-                if (second == 58) {
-                    if (candle.close >= $scope.bb[1]) {
-                        $scope.signal = (candle.close - $scope.bb[1]).toFixed(2);
-                    }
-                    if ($scope.bb[2] >= candle.close) {
-                        $scope.signal = ($scope.bb[2] - candle.close).toFixed(2);
-                    }
-                    setTimeout(function () {
-                        $scope.signal = undefined;
-                        $scope.$apply();
-                    }, 8000);
+    function checkSignal(second, candle) {
+        if (second == 58) {
+            if (candle.close > $scope.bb[1]) {
+                $scope.signal = (candle.close - $scope.bb[1]).toFixed(2);
+                if ($scope.isAuto() && $scope.canTrade()) {
+                    $scope.buyContractForDuration('PUT', 59);
                 }
             }
+            if ($scope.bb[2] > candle.close) {
+                $scope.signal = ($scope.bb[2] - candle.close).toFixed(2);
+                if ($scope.isAuto() && $scope.canTrade()) {
+                    $scope.buyContractForDuration('CALL', 59);
+                }
+            }
+            setTimeout(function () {
+                if ($scope.signal) {
+                    $scope.signal = undefined;
+                    $scope.$apply();
+                }
+            }, 8000);
         }
-        $scope.second = second;
-        $scope.$apply();
-    });
+    }
 
-    api.events.on('balance', function(data) {
-        var balance = data.balance;
-        $scope.balance = balance.balance;
-        $scope.loginid = balance.loginid;
-        $scope.$apply();
-    });
+    function sendNotification(second, candle, delta) {
+        var body = second + 's --> ' + (Math.abs(candle.close - $scope.bb[1]) <= delta ? 'PUT' : 'CALL');
+        var image = Math.abs(candle.close - $scope.bb[1]) <= delta ? 'img/put.png' : 'img/call.png';
+        if (!$scope.notification) {
+            $scope.notification = new Notification('Notification for ' + $scope.config.symbol, {
+                icon: 'https://www.binary.com/images/favicons/favicon-96x96.png',
+                image: image,
+                body: body
+            });
+            $scope.notification.onclick = function () {
+                window.focus();
+                $scope.notification.close();
+            };
+            $scope.notification.onclose = function () {
+                $scope.notification = undefined;
+            };
+            setTimeout(function () {
+                if ($scope.notification) {
+                    $scope.notification.close();
+                }
+            }, 8000);
+        }
+    }
 
     function getTodayTradeResult() {
         api.getProfitTable({
@@ -134,6 +100,56 @@ app.controller('BinaryController', ['$scope', function($scope) {
         }
     }
 
+    api.ping().then(function () {
+        $scope.status = 'Connected';
+        $scope.$apply();
+    });
+
+    api.events.on('ohlc', function(data) {
+        var ohlc = data.ohlc;
+        var lastCandle = $scope.candles[$scope.candles.length - 1];
+        var candle = {
+            open: Number(ohlc.open),
+            close: Number(ohlc.close),
+            high: Number(ohlc.high),
+            low: Number(ohlc.low),
+            time: Number(ohlc.open_time)
+        };
+
+        var second = ohlc.epoch - ohlc.open_time;
+
+        if (candle.time == lastCandle.time) {
+            $scope.candles[$scope.candles.length - 1] = candle;
+        } else {
+            $scope.candles.push(candle);
+        }
+        $scope.bb = calculateBB($scope.candles, {
+            periods: 20,
+            pipSize: 4,
+            stdDevUp: 2.4,
+            stdDevDown: 2.4,
+            field: 'close',
+        });
+
+        var delta = 1;
+
+        if (Math.abs(candle.close - $scope.bb[1]) <= delta || Math.abs(candle.close - $scope.bb[2]) <= delta) {
+            if (second >= 40) {
+                sendNotification(second, candle, delta);
+            }
+            checkSignal(second, candle);
+        }
+        $scope.second = second;
+        $scope.$apply();
+    });
+
+    api.events.on('balance', function(data) {
+        var balance = data.balance;
+        $scope.balance = balance.balance;
+        $scope.loginid = balance.loginid;
+        $scope.$apply();
+    });
+
     api.events.on('proposal_open_contract', function (data) {
         var contract = data.proposal_open_contract;
         if ($scope.contracts.length > 0 && $scope.contracts[0].contract_id == contract.contract_id) {
@@ -157,6 +173,20 @@ app.controller('BinaryController', ['$scope', function($scope) {
         symbol: 'R_100',
         initStake: 1,
         duration: 59,
+        auto: "no",
+        wait: 9,
+    };
+
+    $scope.isAuto = function () {
+        return $scope.auto == "yes";
+    };
+
+    $scope.canTrade = function () {
+        if ($scope.contracts.length == 0 || $scope.contracts[0].status == 'win') {
+            return true;
+        }
+        var now = new Date().getTime();
+        return ($scope.contracts[0].status == 'lost' && now - $scope.contracts[0].purchase_time >= $scope.wait * 60);
     };
 
     var token = Cookies.get('config.token');

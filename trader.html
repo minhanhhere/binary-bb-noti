@@ -31,6 +31,9 @@
             width: 100%;
             height: 840px;
         }
+        .mar__card-header {
+            padding: .4rem 0.9rem;
+        }
     </style>
 
 </head>
@@ -48,31 +51,20 @@
                 <div class="row">
                     <div class="col">
                         <div class="card border-primary mb-3">
-                            <div class="card-header bg-primary text-white">
+                            <div class="card-header bg-primary text-white mar__card-header">
                                 Configure
                             </div>
                             <div class="card-body">
                                 <!--<h5 class="card-title">Special title treatment</h5>-->
                                 <div class="form-group form-row">
                                     <!--<label for="inputToken" class="col-sm-3 col-form-label">Token</label>-->
-                                    <div class="input-group input-group-sm col">
+                                    <div class="input-group input-group-sm col-7">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">Token</span>
                                         </div>
                                         <input type="text" class="form-control" id="inputToken" placeholder="Token" ng-model="config.token">
                                     </div>
-                                </div>
-                                <div class="form-group form-row">
-                                    <div class="input-group input-group-sm col">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">Initial&nbsp;</span>
-                                        </div>
-                                        <input type="text" class="form-control" id="inputInitStake" placeholder="Symbol" ng-model="config.initStake">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">$</span>
-                                        </div>
-                                    </div>
-                                    <div class="input-group input-group-sm col">
+                                    <div class="input-group input-group-sm col-5">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">Symbol</span>
                                         </div>
@@ -85,25 +77,54 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="form-group form-row">
+                                    <div class="input-group input-group-sm col">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Init</span>
+                                        </div>
+                                        <input type="text" class="form-control" id="inputInitStake" placeholder="Symbol" ng-model="config.initStake">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                    </div>
+                                    <div class="input-group input-group-sm col">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Auto</span>
+                                        </div>
+                                        <select class="form-control" ng-model="config.auto">
+                                            <option value="yes">Yes</option>
+                                            <option value="no">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group input-group-sm col">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Wait</span>
+                                        </div>
+                                        <input type="text" class="form-control" placeholder="Symbol" ng-model="config.wait" ng-disabled="config.auto == 'no'">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">m</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="mb-3">
                                     <button ng-click="authorize()" class="btn btn-primary btn-sm" ng-class="{ disabled: status != 'Connected' }">Authorize</button>
                                     <span ng-show="isAuthorizing()">&nbsp;Authorizing...</span>
                                 </div>
-                                <div style="font-size: 0.8em">
-                                    <div>
-                                        Open <mark>{{lastCandle().open}}</mark>&nbsp;
-                                        High <mark>{{lastCandle().high}}</mark>&nbsp;
-                                        Low <mark>{{lastCandle().low}}</mark>&nbsp;
-                                        Close <mark>{{lastCandle().close}}</mark>&nbsp;
-                                    </div>
-                                    <div>
-                                        BB <mark>{{bb[0]}}</mark>&nbsp;<mark>{{bb[1]}}</mark>&nbsp;<mark>{{bb[2]}}</mark>
-                                    </div>
-                                </div>
+                                <!--<div style="font-size: 0.8em">-->
+                                    <!--<div>-->
+                                        <!--Open <mark>{{lastCandle().open}}</mark>&nbsp;-->
+                                        <!--High <mark>{{lastCandle().high}}</mark>&nbsp;-->
+                                        <!--Low <mark>{{lastCandle().low}}</mark>&nbsp;-->
+                                        <!--Close <mark>{{lastCandle().close}}</mark>&nbsp;-->
+                                    <!--</div>-->
+                                    <!--<div>-->
+                                        <!--BB <mark>{{bb[0]}}</mark>&nbsp;<mark>{{bb[1]}}</mark>&nbsp;<mark>{{bb[2]}}</mark>-->
+                                    <!--</div>-->
+                                <!--</div>-->
                             </div>
                         </div>
                         <div class="card border-success mb-3" ng-show="isAuthorized()">
-                            <div class="card-header bg-success text-white">
+                            <div class="card-header bg-success text-white mar__card-header">
                                 Trades ({{contracts.length}})
                             </div>
                             <div class="card-body" style="overflow: auto; height: 240px;">
@@ -136,7 +157,7 @@
                 <div class="row">
                     <div class="col-3">
                         <div class="card border-info mb-3" ng-show="isAuthorized()">
-                            <div class="card-header bg-info text-white">
+                            <div class="card-header bg-info text-white mar__card-header">
                                 Watch</span>
                             </div>
                             <div class="card-body">
@@ -147,7 +168,7 @@
                     </div>
                     <div class="col-9">
                         <div class="card border-dark mb-3" ng-show="isAuthorized()">
-                            <div class="card-header bg-dark text-white">
+                            <div class="card-header bg-dark text-white mar__card-header">
                                 {{loginid}} <span ng-show="balance">({{balance | currency}})</span> <span class="float-right">Profit: {{profit | currency}}</span>
                             </div>
                             <div class="card-body">
