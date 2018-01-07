@@ -58,7 +58,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
     function getTodayTradeResult() {
         api.getProfitTable({
             description: 1,
-            date_from: moment().format('YYYY-MM-DD'),
+            date_from: moment().subtract(1, 'days').format('YYYY-MM-DD'),
             date_to: moment().format('YYYY-MM-DD'),
         }).then(function(data) {
             var transactions = data.profit_table.transactions;
@@ -182,11 +182,11 @@ app.controller('BinaryController', ['$scope', function($scope) {
     };
 
     $scope.canTrade = function () {
-        if ($scope.contracts.length == 0 || $scope.contracts[0].status == 'win') {
+        if ($scope.contracts.length == 0 || $scope.contracts[0].status == 'won') {
             return true;
         }
-        var now = new Date().getTime();
-        return ($scope.contracts[0].status == 'lost' && now - $scope.contracts[0].purchase_time >= $scope.wait * 60);
+        var now = new Date().getTime() / 1000;
+        return ($scope.contracts[0].status == 'lost' && now - $scope.contracts[0].purchase_time >= $scope.config.wait * 60);
     };
 
     var token = Cookies.get('config.token');
