@@ -173,12 +173,12 @@ app.controller('BinaryController', ['$scope', function($scope) {
         symbol: 'R_100',
         initStake: 1,
         duration: 59,
-        auto: "no",
+        auto: false,
         wait: 9,
     };
 
     $scope.isAuto = function () {
-        return $scope.config.auto == "yes";
+        return $scope.config.auto;
     };
 
     $scope.canTrade = function () {
@@ -255,7 +255,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
         api.authorize($scope.config.token).then(function(data) {
             if (data.authorize.loginid.includes('VRTC')) {
                 $scope.config.initStake = 10;
-                $scope.config.auto = 'yes';
+                $scope.config.auto = true;
             }
             $scope.status = 'Authorized';
             $scope.stake = +$scope.config.initStake;

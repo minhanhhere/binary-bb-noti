@@ -34,6 +34,81 @@
         .mar__card-header {
             padding: .4rem 0.9rem;
         }
+
+        .mar__switch {
+            position: relative;
+            display: inline-block;
+            width: 73px;
+            height: 31px;
+            margin-bottom: 0;
+        }
+
+        .mar__switch input {
+            display: none;
+        }
+
+        .mar__slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #dc3545;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .mar__slider:before {
+            position: absolute;
+            content: "";
+            height: 25px;
+            width: 25px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .mar__slider_title:before {
+            color: white;
+            padding: 3px 34px;
+            display: inline-block;
+            content: 'OFF';
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .mar__slider .mar__slider_title:before {
+            content: 'ON';
+            -webkit-transform: translateX(-23px);
+            -ms-transform: translateX(-23px);
+            transform: translateX(-23px);
+        }
+
+        input:checked + .mar__slider {
+            background-color: #28a745;
+        }
+
+        input:focus + .mar__slider {
+            box-shadow: 0 0 1px #28a745;
+        }
+
+        input:checked + .mar__slider:before {
+            -webkit-transform: translateX(42px);
+            -ms-transform: translateX(42px);
+            transform: translateX(42px);
+        }
+
+        /* Rounded sliders */
+        .mar__slider.round {
+            border-radius: 30px;
+        }
+
+        .mar__slider.round:before {
+            border-radius: 50%;
+        }
     </style>
 
 </head>
@@ -91,16 +166,18 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">Auto</span>
                                         </div>
-                                        <select class="form-control" ng-model="config.auto">
-                                            <option value="yes">Yes</option>
-                                            <option value="no">No</option>
-                                        </select>
+                                        <label class="mar__switch">
+                                            <input type="checkbox" ng-model="config.auto">
+                                            <span class="mar__slider">
+                                                <span class="mar__slider_title"></span>
+                                            </span>
+                                        </label>
                                     </div>
                                     <div class="input-group input-group-sm col">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">Wait</span>
                                         </div>
-                                        <input type="text" class="form-control" placeholder="Symbol" ng-model="config.wait" ng-disabled="config.auto == 'no'">
+                                        <input type="text" class="form-control" placeholder="Symbol" ng-model="config.wait" ng-disabled="config.auto == false">
                                         <div class="input-group-append">
                                             <span class="input-group-text">m</span>
                                         </div>
