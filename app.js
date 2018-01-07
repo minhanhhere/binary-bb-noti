@@ -58,7 +58,7 @@ app.controller('BinaryController', ['$scope', function($scope) {
     function getTodayTradeResult() {
         api.getProfitTable({
             description: 1,
-            date_from: moment().subtract(1, 'days').format('YYYY-MM-DD'),
+            date_from: moment().format('YYYY-MM-DD'),
             date_to: moment().format('YYYY-MM-DD'),
         }).then(function(data) {
             var transactions = data.profit_table.transactions;
@@ -252,9 +252,13 @@ app.controller('BinaryController', ['$scope', function($scope) {
     $scope.authorize = function () {
         $scope.status = 'Authorizing';
         Cookies.set('config.token', $scope.config.token);
-        $scope.stake = +$scope.config.initStake;
-        api.authorize($scope.config.token).then(function() {
+        api.authorize($scope.config.token).then(function(data) {
+            if (data.authorize.loginid.includes('VRTC')) {
+                $scope.config.initStake = 10;
+                $scope.config.auto = 'yes';
+            }
             $scope.status = 'Authorized';
+            $scope.stake = +$scope.config.initStake;
             $scope.$apply();
             $scope.getData();
             getTodayTradeResult();
